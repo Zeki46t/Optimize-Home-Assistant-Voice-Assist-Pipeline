@@ -1,0 +1,48 @@
+# Exposed to Assist as an LLM tool. The entity ID in use was script.get_weather_forecast.
+#
+# Naming note: do not call the alias "Get weather forecast". Assist matched that phrase locally
+# and just replied "Started" without ever involving the LLM. A name nobody says avoids that;
+# the description is what tells the model when to call it.
+#
+# Replace weather.forecast_home with your own weather entity.
+# Clothing thresholds are in degrees Fahrenheit.
+# rain_chance_percent is null for providers that do not report precipitation probability.
+alias: Forecast data lookup
+description: Get the weather forecast for today, tomorrow, or the next few days, including what to wear. Use this for any question about upcoming weather or clothing.
+mode: single
+sequence:
+  - action: weather.get_forecasts
+    target:
+      entity_id: weather.forecast_home
+    data:
+      type: daily
+    response_variable: wx
+  - variables:
+      days: |
+        {%- set ns = namespace(items=[]) -%}
+        {%- set rows = (wx['weather.forecast_home'].forecast if wx is defined and wx else [])[:4] -%}
+        {%- for d in rows -%}
+          {%- set high = d.get('temperature') | float(60) -%}
+          {%- set low = d.get('templow') | float(high) -%}
+          {%- set rain = d.get('precipitation_probability') | int(0) -%}
+          {%- set cond = d.get('condition', '') -%}
+          {%- if high >= 85 -%}{%- set wear = 'light breathable clothes like shorts and a t-shirt' -%}
+          {%- elif high >= 70 -%}{%- set wear = 'a t-shirt with shorts or light pants' -%}
+          {%- elif high >= 55 -%}{%- set wear = 'long sleeves or a light jacket' -%}
+          {%- elif high >= 40 -%}{%- set wear = 'a warm jacket' -%}
+          {%- elif high >= 25 -%}{%- set wear = 'a heavy coat, hat and gloves' -%}
+          {%- else -%}{%- set wear = 'a heavy winter coat, hat, gloves and a scarf' -%}
+          {%- endif -%}
+          {%- set extras = [] -%}
+          {%- if (high - low) >= 20 -%}{%- set extras = extras + ['bring an extra layer for the cooler hours'] -%}{%- endif -%}
+          {%- if rain >= 40 or cond in ['rainy', 'pouring', 'lightning-rainy', 'snowy-rainy', 'hail'] -%}{%- set extras = extras + ['take an umbrella or rain jacket'] -%}{%- endif -%}
+          {%- if cond in ['snowy', 'snowy-rainy'] -%}{%- set extras = extras + ['wear waterproof boots'] -%}{%- endif -%}
+          {%- if cond in ['windy', 'windy-variant'] -%}{%- set extras = extras + ['a windbreaker will help'] -%}{%- endif -%}
+          {%- set ns.items = ns.items + [{'date': d.get('datetime', '')[:10], 'condition': cond, 'high': d.get('temperature'), 'low': d.get('templow'), 'rain_chance_percent': d.get('precipitation_probability'), 'clothing': ([wear] + extras) | join('; ')}] -%}
+        {%- endfor -%}
+        {{ ns.items }}
+  - variables:
+      result:
+        forecast: "{{ days }}"
+  - stop: Forecast retrieved
+    response_variable: result
