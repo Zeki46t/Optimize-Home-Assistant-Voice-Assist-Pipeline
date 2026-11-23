@@ -21,7 +21,7 @@ Home Assistant sits in the middle and calls each service in turn, so the service
 | STT, `tiny-int8` on CPU | ~1.2 s, often empty transcripts | n/a (accuracy too low) |
 | STT, `small.en` on CPU (float32) | ~9.4 s | n/a (too slow) |
 | STT, `small.en` on GPU | n/a | ~0.1 to 0.2 s |
-| STT, `medium.en` on GPU | n/a | (not yet measured) |
+| STT, `medium.en` on GPU | n/a | ~0.35 s after end of speech (one trace, short command) |
 | Simple command, local intent match | n/a | ~12 ms intent time |
 | Forecast question via LLM tool call | wrong answer (guessed) | correct, ~4.8 s end to end |
 
