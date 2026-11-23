@@ -7,7 +7,7 @@ A fully local Home Assistant Assist setup: fast commands handled by the built-in
 | Stage | Component | Where it runs |
 |---|---|---|
 | Wake word | microWakeWord on the satellite (openWakeWord container available as an alternative) | Satellite / Wyoming LXC |
-| Speech-to-text | `wyoming-faster-whisper`, `small.en`, CUDA, `int8_float32` | GPU LXC (Pascal P102-100) |
+| Speech-to-text | `wyoming-faster-whisper`, `medium.en`, CUDA, `int8_float32` | GPU LXC (Pascal P102-100) |
 | Conversation | Ollama, Gemma 4 12B, 12288 context, "Prefer handling commands locally" on | GPU node |
 | Text-to-speech | Piper (`en_US-hfc_male-medium`) over Wyoming | Wyoming LXC (Docker) |
 | Satellites | M5Stack Echo Pyramid + AtomS3R (ESPHome) | Room |
@@ -21,6 +21,7 @@ Home Assistant sits in the middle and calls each service in turn, so the service
 | STT, `tiny-int8` on CPU | ~1.2 s, often empty transcripts | n/a (accuracy too low) |
 | STT, `small.en` on CPU (float32) | ~9.4 s | n/a (too slow) |
 | STT, `small.en` on GPU | n/a | ~0.1 to 0.2 s |
+| STT, `medium.en` on GPU | n/a | (not yet measured) |
 | Simple command, local intent match | n/a | ~12 ms intent time |
 | Forecast question via LLM tool call | wrong answer (guessed) | correct, ~4.8 s end to end |
 
@@ -40,6 +41,11 @@ Home Assistant sits in the middle and calls each service in turn, so the service
 3. **LLMs guess unless told not to.** The prompt must say to call tools for weather and state, and to say "I don't know" otherwise.
 4. **Context size matters.** 6000 tokens was too small once the entity list, tool definitions and prompt were included. 12288 works, at the cost of splitting the 12B model across two 10 GB cards.
 5. **Cold start.** The first request after a model (re)load took ~12 s. Later requests took ~2 s per LLM call.
+6. **Whisper model size.** Started at `tiny-int8`, moved to `small.en`, now running `medium.en` on the GPU. Check `nvidia-smi` with the LLM loaded to make sure both fit (`small.en` used about 460 MB).
+
+## Current status
+
+Lights were renamed so none end in a number, the old CPU Whisper entry was removed from the Wyoming integration, and Whisper now runs `medium.en`. Media control is still untested (see `docs/media-control.md`).
 
 ## Notes on privacy
 

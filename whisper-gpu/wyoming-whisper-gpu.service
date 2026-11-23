@@ -12,7 +12,7 @@ Environment=LD_LIBRARY_PATH=/root/wyoming-faster-whisper/.venv/lib/python3.12/si
 # --vad-filter stops Whisper inventing words ("You") on silence.
 # Do NOT add --vad-endpointing: it breaks satellite pipelines (see docs/troubleshooting.md).
 ExecStart=/root/wyoming-faster-whisper/script/run \
-  --model small.en \
+  --model medium.en \
   --language en \
   --device cuda \
   --compute-type int8_float32 \

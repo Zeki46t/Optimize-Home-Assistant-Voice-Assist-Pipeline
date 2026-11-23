@@ -22,11 +22,11 @@ script/setup
 
 ```bash
 export LD_LIBRARY_PATH=/root/wyoming-faster-whisper/.venv/lib/python3.12/site-packages/nvidia/cublas/lib:/root/wyoming-faster-whisper/.venv/lib/python3.12/site-packages/nvidia/cudnn/lib:$LD_LIBRARY_PATH
-script/run --model small.en --language en --device cuda --compute-type int8_float32 \
+script/run --model medium.en --language en --device cuda --compute-type int8_float32 \
   --uri 'tcp://0.0.0.0:10300' --data-dir /var/lib/wyoming-whisper --download-dir /var/lib/wyoming-whisper
 ```
 
-Say a command and check `nvidia-smi` for a Python process using VRAM (about 460 MB for `small.en`).
+Say a command and check `nvidia-smi` for a Python process using VRAM (about 460 MB for `small.en`; `medium.en` needs more, so confirm it fits alongside the LLM). `small.en` is a good fallback if VRAM is tight.
 
 ## Install as a service
 
