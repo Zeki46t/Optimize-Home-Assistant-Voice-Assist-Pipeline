@@ -26,7 +26,7 @@ script/run --model medium.en --language en --device cuda --compute-type int8_flo
   --uri 'tcp://0.0.0.0:10300' --data-dir /var/lib/wyoming-whisper --download-dir /var/lib/wyoming-whisper
 ```
 
-Say a command and check `nvidia-smi` for a Python process using VRAM (about 460 MB for `small.en`; `medium.en` needs more, so confirm it fits alongside the LLM). `small.en` is a good fallback if VRAM is tight.
+Say a command and check `nvidia-smi` for a Python process using VRAM (about 460 MB for `small.en`; `medium.en` measured about 1.1 GB, sitting next to about 6.9 GB of Gemma on the same 10 GB card). `small.en` is a good fallback if VRAM is tight.
 
 ## Install as a service
 

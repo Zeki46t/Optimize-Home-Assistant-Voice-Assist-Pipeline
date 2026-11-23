@@ -41,7 +41,7 @@ Home Assistant sits in the middle and calls each service in turn, so the service
 3. **LLMs guess unless told not to.** The prompt must say to call tools for weather and state, and to say "I don't know" otherwise.
 4. **Context size matters.** 6000 tokens was too small once the entity list, tool definitions and prompt were included. 12288 works, at the cost of splitting the 12B model across two 10 GB cards.
 5. **Cold start.** The first request after a model (re)load took ~12 s. Later requests took ~2 s per LLM call.
-6. **Whisper model size.** Started at `tiny-int8`, moved to `small.en`, now running `medium.en` on the GPU. Check `nvidia-smi` with the LLM loaded to make sure both fit (`small.en` used about 460 MB).
+6. **Whisper model size.** Started at `tiny-int8`, moved to `small.en`, now running `medium.en` on the GPU. `medium.en` uses about 1.1 GB of VRAM (`small.en` about 460 MB). With Gemma loaded, GPU 0 sits around 8 GB of 10 GB and GPU 1 around 7.3 GB, so both fit with headroom.
 
 ## Current status
 
